@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # React Frontend (Vite)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: orbitra-client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - orbitra-network
+    depends_on:
+      - server
+    stdin_open: true
+    tty: true
+
+  # Node.js Backend (Express)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: orbitra-server
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - orbitra-network
+    restart: unless-stopped
+
+networks:
+  orbitra-network:
+    driver: bridge
