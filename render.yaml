@@ -35,8 +35,6 @@ services:
     runtime: static
     buildCommand: cd client && npm ci && npm run build
     staticPublishPath: ./client/dist
-    plan: free
-    region: oregon
     headers:
       - path: /*
         name: Cache-Control
