@@ -16,12 +16,8 @@ RUN sed -i 's|file:../shared|file:./shared|' package.json
 # Install dependencies
 RUN npm install --omit=dev
 
-# Copy server source and any config files present
+# Copy server source
 COPY server/src/ ./src/
-COPY server/ /tmp/server-files/
-RUN cp /tmp/server-files/service-account-key.json ./service-account-key.json 2>/dev/null; \
-    rm -rf /tmp/server-files; \
-    exit 0
 
 EXPOSE 8009
 
