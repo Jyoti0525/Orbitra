@@ -4,7 +4,11 @@
  * Can be used by Express server or Firebase Functions
  */
 import axios from 'axios';
+import { Agent } from 'https';
 import { calculateRiskScore, parseNumber } from './riskCalculator.js';
+
+// Force IPv4 — Node.js on Alpine tries IPv6 first which times out
+const httpsAgent = new Agent({ family: 4 });
 
 /**
  * Create NASA service with Firestore db instance
@@ -39,33 +43,41 @@ export function createNasaService(db, config) {
       }
 
       console.log(`Fetching NASA feed: ${startDate} to ${endDate || startDate}`);
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, { params, httpsAgent, timeout: 30000 });
 
-      // Parse and save asteroids
+      // Parse asteroids (don't let Firestore writes block the response)
       const asteroids = [];
       const nearEarthObjects = response.data.near_earth_objects;
 
       for (const date in nearEarthObjects) {
         for (const asteroid of nearEarthObjects[date]) {
-          const parsed = parseAsteroidData(asteroid);
-          await saveAsteroid(parsed);
-          asteroids.push(parsed);
+          asteroids.push(parseAsteroidData(asteroid));
         }
       }
 
       console.log(`Fetched ${asteroids.length} asteroids from NASA`);
 
-      // Save to daily cache for fast homepage loads
+      // Background save to Firestore (fire-and-forget, never blocks response)
+      Promise.allSettled(asteroids.map(a => saveAsteroid(a))).catch(() => {});
       if (!endDate || startDate === endDate) {
-        await saveDailyCache(startDate, asteroids);
+        saveDailyCache(startDate, asteroids).catch(() => {});
       }
 
       return asteroids;
     } catch (error) {
-      console.error('NASA Feed API error:', error.message);
+      console.error('NASA Feed API error:', error.message || error.code || error);
+      if (error.response) {
+        console.error('NASA response status:', error.response.status, error.response.data);
+      }
 
-      // Handle Quota Exceeded using cached data or empty array
-      if (error.response?.status === 429 || error.message.includes('429')) {
+      // If this is a Firestore error (from background saves leaking), still return data
+      if (error.code === 8 || error.message?.includes('RESOURCE_EXHAUSTED')) {
+        console.warn('Firestore quota issue during feed fetch, ignoring');
+        return [];
+      }
+
+      // Handle NASA API Quota Exceeded
+      if (error.response?.status === 429 || error.message?.includes('429')) {
         console.warn('NASA API Quota Exceeded. Returning empty list to prevent crash.');
         return [];
       }
@@ -85,10 +97,10 @@ export function createNasaService(db, config) {
       const params = { api_key: NASA_API_KEY };
 
       console.log(`Fetching asteroid ${neoId} from NASA`);
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, { params, httpsAgent, timeout: 30000 });
 
       const parsed = parseAsteroidData(response.data);
-      await saveAsteroid(parsed);
+      saveAsteroid(parsed).catch(() => {}); // background save
 
       return parsed;
     } catch (error) {
@@ -111,14 +123,12 @@ export function createNasaService(db, config) {
       };
 
       console.log(`Browsing NASA catalog page ${page}`);
-      const response = await axios.get(url, { params });
+      const response = await axios.get(url, { params, httpsAgent, timeout: 30000 });
 
       const asteroids = response.data.near_earth_objects.map(parseAsteroidData);
 
-      // Save all to Firestore
-      for (const asteroid of asteroids) {
-        await saveAsteroid(asteroid);
-      }
+      // Background save to Firestore (fire-and-forget)
+      Promise.allSettled(asteroids.map(a => saveAsteroid(a))).catch(() => {});
 
       return {
         asteroids,
