@@ -1,0 +1,422 @@
+/* =====================================================
+   Asteroid Chat – Reddit-style Threaded Discussion
+   ===================================================== */
+
+.asteroid-chat-section {
+  background: var(--detail-panel);
+  border-radius: 28px;
+  border: 1px solid var(--detail-border);
+  padding: clamp(1.1rem, 2.5vw, 1.8rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ===== Header ===== */
+.asteroid-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.asteroid-chat-header h2 {
+  margin-top: 0.4rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: var(--detail-text);
+}
+
+.chat-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--detail-muted);
+}
+
+.chat-meta-dot {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== Sort Bar ===== */
+.chat-sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--detail-border);
+}
+
+.sort-label {
+  font-size: 0.75rem;
+  color: var(--detail-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.sort-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--detail-muted);
+  font-size: 0.78rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-btn:hover {
+  color: var(--detail-text);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sort-btn.active {
+  background: rgba(126, 255, 224, 0.1);
+  border-color: rgba(126, 255, 224, 0.3);
+  color: var(--accent);
+}
+
+/* ===== Compose Box ===== */
+.chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reply-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(99, 176, 255, 0.06);
+  border: 1px solid rgba(99, 176, 255, 0.2);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  color: var(--detail-muted);
+}
+
+.reply-indicator strong {
+  color: var(--accent2);
+}
+
+.reply-cancel {
+  background: none;
+  border: none;
+  color: var(--detail-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0 0.3rem;
+  transition: color 0.2s;
+}
+
+.reply-cancel:hover {
+  color: #ff6b6b;
+}
+
+.compose-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.compose-avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+.compose-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+  color: var(--detail-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: none;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+}
+
+.compose-input:focus {
+  outline: none;
+  border-color: rgba(126, 255, 224, 0.4);
+}
+
+.compose-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.compose-input:disabled {
+  opacity: 0.5;
+}
+
+.compose-send {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #05060c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.compose-send:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.compose-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.compose-hint {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-left: 42px;
+}
+
+.chat-login-prompt {
+  padding: 1rem;
+  text-align: center;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.chat-login-prompt p {
+  color: var(--detail-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ===== Thread List ===== */
+.thread-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 600px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.thread-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.thread-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thread-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+/* ===== Thread Item ===== */
+.thread-item {
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+.thread-item.is-root {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.thread-item.is-root:last-child {
+  border-bottom: none;
+}
+
+.thread-item.is-reply {
+  padding: 0.5rem 0;
+}
+
+/* ===== Thread Line (Reddit-style vertical connector) ===== */
+.thread-line-container {
+  position: relative;
+  width: 20px;
+  min-width: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.thread-line {
+  position: absolute;
+  top: 38px;
+  bottom: 0;
+  width: 2px;
+  background: rgba(126, 255, 224, 0.12);
+  border-radius: 999px;
+}
+
+.thread-item.is-root:hover .thread-line {
+  background: rgba(126, 255, 224, 0.25);
+}
+
+.thread-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== Author Row ===== */
+.thread-author-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.3rem;
+}
+
+.thread-avatar {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.is-reply .thread-avatar {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  font-size: 0.5rem;
+}
+
+.thread-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.thread-username {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--detail-text);
+}
+
+.thread-username.is-own {
+  color: var(--accent);
+}
+
+.is-reply .thread-username {
+  font-size: 0.75rem;
+}
+
+.thread-dot {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 0.7rem;
+}
+
+.thread-time {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Message Body ===== */
+.thread-body {
+  padding-left: 0;
+  margin-bottom: 0.3rem;
+}
+
+.thread-body p {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  word-break: break-word;
+}
+
+.is-reply .thread-body p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ===== Actions ===== */
+.thread-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.thread-action-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.thread-action-btn:hover {
+  color: var(--accent);
+  background: rgba(126, 255, 224, 0.06);
+}
+
+.thread-collapse-btn {
+  color: rgba(99, 176, 255, 0.5);
+}
+
+.thread-collapse-btn:hover {
+  color: var(--accent2);
+  background: rgba(99, 176, 255, 0.06);
+}
+
+/* ===== Thread Replies ===== */
+.thread-replies {
+  margin-left: 12px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(99, 176, 255, 0.12);
+  margin-top: 0.3rem;
+}
+
+.thread-replies:hover {
+  border-left-color: rgba(99, 176, 255, 0.25);
+}
+
+/* ===== Empty State ===== */
+.thread-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.thread-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.thread-empty p {
+  color: var(--detail-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}

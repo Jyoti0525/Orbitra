@@ -1,0 +1,459 @@
+{
+  "info": {
+    "name": "Orbitra API - Cosmic Watch Platform",
+    "description": "Complete API documentation for Orbitra asteroid monitoring platform. Includes endpoints for asteroids, user management, watchlist, alerts, and real-time chat.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "orbitra-api-v1",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "neo_id",
+      "value": "54416893",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Asteroids & Feed",
+      "description": "Public endpoints for asteroid data from NASA",
+      "item": [
+        {
+          "name": "GET Asteroid Feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/feed?start_date=2026-02-07&end_date=2026-02-08",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "feed"],
+              "query": [
+                {"key": "start_date", "value": "2026-02-07"},
+                {"key": "end_date", "value": "2026-02-08"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has asteroids array', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "  pm.expect(json.asteroids).to.be.an('array');",
+                  "});",
+                  "pm.test('Each asteroid has required fields', () => {",
+                  "  const asteroids = pm.response.json().asteroids;",
+                  "  if (asteroids.length > 0) {",
+                  "    const ast = asteroids[0];",
+                  "    pm.expect(ast).to.have.property('id');",
+                  "    pm.expect(ast).to.have.property('name');",
+                  "    pm.expect(ast).to.have.property('riskScore');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Asteroid by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/{{neo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "{{neo_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has asteroid object', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "  pm.expect(json.asteroid).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Today's Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "stats"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has stats object', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.stats).to.have.property('total_today');",
+                  "  pm.expect(json.stats).to.have.property('hazardous_count');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Random Asteroid",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/random",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "random"]
+            }
+          }
+        },
+        {
+          "name": "GET Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/trends?days=7",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "trends"],
+              "query": [{"key": "days", "value": "7"}]
+            }
+          }
+        },
+        {
+          "name": "GET Calendar Month",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/asteroids/calendar?month=2026-02",
+              "host": ["{{base_url}}"],
+              "path": ["api", "asteroids", "calendar"],
+              "query": [{"key": "month", "value": "2026-02"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "description": "Firebase authentication endpoints",
+      "item": [
+        {
+          "name": "POST Sign In with Google",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"<FIREBASE_ID_TOKEN>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/google",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "google"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) {",
+                  "    pm.environment.set('token', json.token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "description": "User profile and history endpoints (auth required)",
+      "item": [
+        {
+          "name": "GET User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "profile"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has profile with stats', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.profile).to.have.property('stats');",
+                  "  pm.expect(json.profile.stats).to.have.property('watching');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Alex Johnson\",\n  \"preferences\": {\n    \"theme\": \"dark\",\n    \"alertDelivery\": \"dashboard\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "profile"]
+            }
+          }
+        },
+        {
+          "name": "GET Activity History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/history?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "history"],
+              "query": [{"key": "limit", "value": "50"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Watchlist",
+      "description": "User watchlist management (auth required)",
+      "item": [
+        {
+          "name": "GET Watchlist",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/watchlist",
+              "host": ["{{base_url}}"],
+              "path": ["api", "watchlist"]
+            }
+          }
+        },
+        {
+          "name": "POST Add to Watchlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/watchlist/{{neo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "watchlist", "{{neo_id}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Remove from Watchlist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/watchlist/{{neo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "watchlist", "{{neo_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "description": "User alert rules (auth required)",
+      "item": [
+        {
+          "name": "GET Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alerts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alerts"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alertType\": \"hazardous\",\n  \"thresholdValue\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alerts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alerts"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Alert",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alerts/<alert_id>",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alerts", "<alert_id>"]
+            }
+          }
+        },
+        {
+          "name": "GET Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "description": "Community chat endpoints (auth required)",
+      "item": [
+        {
+          "name": "GET Chat Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chat/messages?room=general&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chat", "messages"],
+              "query": [
+                {"key": "room", "value": "general"},
+                {"key": "limit", "value": "50"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello from Postman!\",\n  \"room\": \"general\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chat/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chat", "messages"]
+            }
+          }
+        },
+        {
+          "name": "GET Online Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chat/online?room=general",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chat", "online"],
+              "query": [{"key": "room", "value": "general"}]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

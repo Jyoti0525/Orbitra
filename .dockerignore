@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/build
+**/.env.local
+**/.firebase
+**/firebase-debug.log
+**/*.log
+.git
+.vscode
+.idea

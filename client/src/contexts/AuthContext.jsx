@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
           setUser(firebaseUser);
 
           // Create session cookie on backend
-          await api.post('/auth/sessionLogin', { idToken: token });
+          await api.post('/api/auth/sessionLogin', { idToken: token });
         } catch (err) {
           console.error('Auth error:', err);
           setError(err.message);
@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
       const token = await result.user.getIdToken();
 
       // Backend will create session cookie
-      await api.post('/auth/sessionLogin', { idToken: token });
+      await api.post('/api/auth/sessionLogin', { idToken: token });
 
       return result.user;
     } catch (err) {
@@ -62,17 +62,25 @@ export function AuthProvider({ children }) {
   // Sign out
   const signOut = async () => {
     try {
-      // Clear backend session
-      await api.post('/auth/logout');
+      setLoading(true);
 
-      // Sign out from Firebase
+      // Sign out from Firebase FIRST (clears localStorage and triggers onAuthStateChanged)
       await firebaseSignOut(auth);
 
+      // Clear backend session
+      await api.post('/api/auth/logout').catch(err => {
+        // Ignore backend errors during logout
+        console.warn('Backend logout error:', err);
+      });
+
+      // Manually clear state
       setUser(null);
       setIdToken(null);
+      setLoading(false);
     } catch (err) {
       console.error('Sign out error:', err);
       setError(err.message);
+      setLoading(false);
     }
   };
 

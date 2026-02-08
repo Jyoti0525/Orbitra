@@ -74,3 +74,9 @@ export const verifySession = async (req, res, next) => {
     });
   }
 };
+
+/**
+ * Alias for backward compatibility
+ * Some route files may still use 'authenticateToken'
+ */
+export const authenticateToken = requireAuth;

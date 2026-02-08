@@ -1,39 +1,41 @@
 version: '3.8'
 
 services:
-  # React Frontend (Vite)
+  # React Frontend (Vite production build + nginx)
   client:
     build:
-      context: ./client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: client/Dockerfile
+      args:
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8009}
     container_name: orbitra-client
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:5000
-    volumes:
-      - ./client:/app
-      - /app/node_modules
+      - "8010:80"
     networks:
       - orbitra-network
     depends_on:
       - server
-    stdin_open: true
-    tty: true
+    restart: unless-stopped
 
   # Node.js Backend (Express)
   server:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: server/Dockerfile
     container_name: orbitra-server
     ports:
-      - "5000:5000"
+      - "8009:8009"
     env_file:
       - ./server/.env
-    volumes:
-      - ./server:/app
-      - /app/node_modules
+    environment:
+      - PORT=8009
+      - ALLOWED_ORIGINS=http://localhost:8010
     networks:
       - orbitra-network
     restart: unless-stopped

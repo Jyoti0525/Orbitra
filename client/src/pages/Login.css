@@ -1,0 +1,272 @@
+/* =====================================================
+   Orbitra Sign-In Page
+   Adapted from ui sample/sign-in/styles.css
+   ===================================================== */
+
+:root {
+  --bg: #040312;
+  --bg2: #090824;
+  --text: #f5f7ff;
+  --muted: #9ba1c5;
+  --primary: #7effe0;
+  --accent: #63b0ff;
+  --danger: #ff6b6b;
+}
+
+/* ===== Main Container ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #040312 0%, #090824 50%, #0d0a2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Disable global starfield animations on login page but keep stars visible */
+body.no-star-animation::before,
+body.no-star-animation::after {
+  animation: none !important;
+  opacity: 0.6 !important;
+  z-index: 1;
+}
+
+body.no-star-animation::after {
+  opacity: 0.5 !important;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(126, 255, 224, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99, 176, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== Auth Shell (Two-panel container) ===== */
+.auth-shell {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  max-width: 1100px;
+  width: 100%;
+  padding: 3rem;
+  background: rgba(7, 6, 20, 0.8);
+  border-radius: 36px;
+  border: 1px solid rgba(126, 255, 224, 0.1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Hero Panel (Left side) ===== */
+.hero-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem;
+  border-radius: 28px;
+  background: rgba(10, 10, 30, 0.7);
+  border: 1px solid rgba(126, 255, 224, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(126, 255, 224, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-panel .eyebrow {
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.hero-panel h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.hero-panel p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ===== Auth Card (Right side) ===== */
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 2.5rem;
+  background: rgba(6, 6, 18, 0.9);
+  border-radius: 28px;
+  border: 1px solid rgba(99, 176, 255, 0.15);
+  backdrop-filter: blur(24px);
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-card h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.muted {
+  font-size: 1rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* ===== Google Sign-In Button ===== */
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.google-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.google-btn:active {
+  transform: translateY(0);
+}
+
+.google-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.google-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+/* ===== Error Message ===== */
+.error-message {
+  padding: 1rem;
+  margin-top: 1rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 12px;
+  color: var(--danger);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* ===== Terms Text ===== */
+.tiny {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(155, 161, 197, 0.7);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.tiny a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.tiny a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .hero-panel {
+    padding: 2rem;
+  }
+
+  .hero-panel h1 {
+    font-size: 2rem;
+  }
+
+  .auth-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-card h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .auth-shell {
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
+
+  .hero-panel h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero-panel p {
+    font-size: 1rem;
+  }
+}

@@ -59,7 +59,13 @@ router.post('/sessionLogin', async (req, res) => {
  * Clear session cookie
  */
 router.post('/logout', (req, res) => {
-  res.clearCookie('session');
+  // Clear cookie with same options as when it was set
+  res.clearCookie('session', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+
   res.json({
     success: true,
     message: 'Logged out successfully'

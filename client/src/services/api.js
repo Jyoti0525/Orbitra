@@ -1,7 +1,7 @@
 // API Client - handles all HTTP requests to backend
 import { auth } from '../config/firebase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8009';
 
 class ApiClient {
   constructor(baseURL) {
@@ -38,6 +38,7 @@ class ApiClient {
         ...headers,
         ...options.headers,
       },
+      credentials: 'include',
     };
 
     try {
@@ -99,6 +100,12 @@ export const asteroidApi = {
 
   browse: (page = 0) =>
     api.get(`/api/asteroids/browse?page=${page}`),
+
+  getComparisonDataset: () =>
+    api.get('/api/asteroids/comparison-dataset'),
+
+  getTopRisk: (limit = 10) =>
+    api.get(`/api/asteroids/top-risk?limit=${limit}`),
 };
 
 export const watchlistApi = {
@@ -111,6 +118,7 @@ export const alertsApi = {
   getAll: () => api.get('/api/alerts'),
   create: (alertData) => api.post('/api/alerts', alertData),
   delete: (alertId) => api.delete(`/api/alerts/${alertId}`),
+  toggle: (alertId, isActive) => api.patch(`/api/alerts/${alertId}/toggle`, { isActive }),
 };
 
 export const notificationsApi = {
