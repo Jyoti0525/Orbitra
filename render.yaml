@@ -33,7 +33,7 @@ services:
   - type: web
     name: orbitra-client
     runtime: static
-    buildCommand: cd client && npm ci && npm run build
+    buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
     headers:
       - path: /*
