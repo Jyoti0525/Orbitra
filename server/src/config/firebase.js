@@ -18,7 +18,16 @@ let credential;
 if (existsSync(serviceAccountPath)) {
   const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
   credential = admin.credential.cert(serviceAccount);
+} else if (process.env.FIREBASE_PRIVATE_KEY_BASE64) {
+  // Base64-encoded key (safest for cloud platforms like Render)
+  const privateKey = Buffer.from(process.env.FIREBASE_PRIVATE_KEY_BASE64, 'base64').toString('utf8');
+  credential = admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey,
+  });
 } else if (process.env.FIREBASE_PRIVATE_KEY) {
+  // Raw key with escaped newlines
   credential = admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,

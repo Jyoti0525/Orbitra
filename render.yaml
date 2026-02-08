@@ -20,7 +20,7 @@ services:
         sync: false
       - key: FIREBASE_CLIENT_EMAIL
         sync: false
-      - key: FIREBASE_PRIVATE_KEY
+      - key: FIREBASE_PRIVATE_KEY_BASE64
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
