@@ -1,7 +1,7 @@
 // Firebase Admin SDK Configuration
 import admin from 'firebase-admin';
 import dotenv from 'dotenv';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -11,13 +11,24 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load service account key
+// Try service-account-key.json first, fall back to env vars (for cloud deployment)
 const serviceAccountPath = join(__dirname, '../../service-account-key.json');
-const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+let credential;
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+if (existsSync(serviceAccountPath)) {
+  const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+  credential = admin.credential.cert(serviceAccount);
+} else if (process.env.FIREBASE_PRIVATE_KEY) {
+  credential = admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  });
+} else {
+  throw new Error('No Firebase credentials found. Provide service-account-key.json or FIREBASE_* env vars.');
+}
+
+admin.initializeApp({ credential });
 
 // Export Firebase Admin services
 export const auth = admin.auth();
